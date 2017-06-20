@@ -1,0 +1,1 @@
+export PATH=~/repos/kotlin-native/dist/bin/:$PATH

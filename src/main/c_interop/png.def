@@ -1,0 +1,2 @@
+headers = /usr/local/include/png.h
+excludeDependentModules.osx = true
