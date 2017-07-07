@@ -47,7 +47,7 @@ val TOP_BAND = Band(listOf(
 
 val MIDDLE_BAND = Band(listOf(
 		ColorSource(Point(0.5f, 0.0f), Color(248, 137, 9)),
-		ColorSource(Point(0.5f, 1.0f), Color(248, 137, 9)),
+		ColorSource(Point(1.0f, 0.0f), Color(248, 137, 9)),
 		ColorSource(Point(0.0f, 0.5f), Color(215, 103, 128)),
 		ColorSource(Point(0.0f, 1.0f), Color(199, 87, 188))))
 
