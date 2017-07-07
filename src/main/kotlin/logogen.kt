@@ -23,6 +23,44 @@ fun setRGB(rowBuffer: CPointer<ByteVar>, y: Int, x: Int, color: Color) {
 	}
 }
 
+data class Point(val x: Float, val y: Float) {
+	fun distance(other: Point) = sqrt(pow((x - other.x).toDouble(), 2.0) + pow((y - other.y).toDouble(), 2.0))
+}
+
+data class ColorSource(val point: Point, val color: Color)
+
+class Band(val colorSources: List<ColorSource>) {
+	fun color(point: Point) : Color {
+		val invDistances = colorSources.map { 1.0f/it.point.distance(point)}
+		val sumInvDistances = invDistances.sum()
+		var r : Double = 0.0
+		var g : Double = 0.0
+		var b : Double = 0.0
+		colorSources.forEachIndexed { i, colorSource ->
+			r += colorSource.color.r * (invDistances[i]/sumInvDistances)
+			g += colorSource.color.g * (invDistances[i]/sumInvDistances)
+			b += colorSource.color.b * (invDistances[i]/sumInvDistances)
+		}
+		return Color(r.toInt(), g.toInt(), b.toInt())
+	}
+}
+
+val TOP_BAND = Band(listOf(
+		ColorSource(Point(0.0f, 0.0f), Color(24, 141, 215)),
+		ColorSource(Point(0.5f, 0.0f), Color(128, 110, 227)),
+		ColorSource(Point(0.0f, 0.5f), Color(0, 149, 213))))
+
+val MIDDLE_BAND = Band(listOf(
+		ColorSource(Point(0.5f, 0.0f), Color(248, 137, 9)),
+		ColorSource(Point(0.5f, 1.0f), Color(248, 137, 9)),
+		ColorSource(Point(0.0f, 0.5f), Color(215, 103, 128)),
+		ColorSource(Point(0.0f, 1.0f), Color(199, 87, 188))))
+
+val LOWER_BAND = Band(listOf(
+		ColorSource(Point(0.5f, 0.5f), Color(128, 110, 227)),
+		ColorSource(Point(0.0f, 1.0f), Color(0, 149, 213)),
+		ColorSource(Point(1.0f, 1.0f), Color(128, 110, 227))))
+
 fun draw_logo(width: Int, height: Int, filename: String) {
 	val fp = fopen(filename, "wb")
 	if (fp == null) {
@@ -61,13 +99,14 @@ fun draw_logo(width: Int, height: Int, filename: String) {
 			val topBand = yProp <= 0.5 && xProp <= (0.5 - yProp)
 			val middleBand = !topBand && xProp <= (1.0 - yProp)
 			val lowerBand = yProp >= 0.5 && ((xProp <= 0.5 && xProp>= (1.0-yProp)) || (xProp>=0.5 && xProp <= yProp))
-			if (topBand || lowerBand) {
-				setRGB(rowBuffer, y, x, BLUE)
-			} else if (middleBand) {
-				setRGB(rowBuffer, y, x, ORANGE)
-			} else {
-				setRGB(rowBuffer, y, x, WHITE)
+			val band = when {
+				topBand -> TOP_BAND
+				middleBand -> MIDDLE_BAND
+				lowerBand -> LOWER_BAND
+				else -> null
 			}
+			val color = band?.color(Point(xProp, yProp)) ?: WHITE
+			setRGB(rowBuffer, y, x, color)
 		}
 		png_write_row(png_ptr, rowBuffer)
 	}
@@ -78,6 +117,19 @@ fun draw_logo(width: Int, height: Int, filename: String) {
 	println("Logo of size $width x $height generated in $filename")
 }
 
+val MAX_SIZE = 2000
+
 fun main(args: Array<String>) {
-	draw_logo(500, 500, "logo.png")
+	if (args.size != 2) {
+		println("2 arguments expected, while we received ${args.size}")
+		return
+	}
+	val width = args[0].toIntOrNull()
+	val height = args[1].toIntOrNull()
+	if (width != null && height != null && width in 1..MAX_SIZE && height in 1..MAX_SIZE) {
+		draw_logo(width, height, "logo_${width}x$height.png")
+	} else {
+		println("Please specify positive dimensions equal or lower than $MAX_SIZE")
+		return
+	}
 }

@@ -1,2 +1,2 @@
-headers = /usr/local/include/png.h stdio.h stdlib.h string.h
+headers = /usr/local/include/png.h stdio.h stdlib.h string.h math.h
 excludeDependentModules.osx = true
