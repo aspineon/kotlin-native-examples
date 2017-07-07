@@ -13,14 +13,9 @@ val BLUE = Color(39, 137, 217)
 val WHITE = Color(255, 255, 255)
 
 fun setRGB(rowBuffer: CPointer<ByteVar>, y: Int, x: Int, color: Color) {
-	try {
-		rowBuffer.plus(3 * x + 0)!!.reinterpret<ShortVar>()[0] = color.r.toShort()
-		rowBuffer.plus(3 * x + 1)!!.reinterpret<ShortVar>()[0] = color.g.toShort()
-		rowBuffer.plus(3 * x + 2)!!.reinterpret<ShortVar>()[0] = color.b.toShort()
-	} catch (e: Exception) {
-		e.printStackTrace()
-		exit(1)
-	}
+	rowBuffer.plus(3 * x + 0)!!.reinterpret<ShortVar>()[0] = color.r.toShort()
+	rowBuffer.plus(3 * x + 1)!!.reinterpret<ShortVar>()[0] = color.g.toShort()
+	rowBuffer.plus(3 * x + 2)!!.reinterpret<ShortVar>()[0] = color.b.toShort()
 }
 
 data class Point(val x: Float, val y: Float) {
