@@ -14,9 +14,9 @@ val WHITE = Color(255, 255, 255)
 
 fun setRGB(rowBuffer: CPointer<ByteVar>, y: Int, x: Int, color: Color) {
 	try {
-		rowBuffer.plus(3 * x + 0)!!.reinterpret<IntVar>()[0] = color.r
-		rowBuffer.plus(3 * x + 1)!!.reinterpret<IntVar>()[0] = color.g
-		rowBuffer.plus(3 * x + 2)!!.reinterpret<IntVar>()[0] = color.b
+		rowBuffer.plus(3 * x + 0)!!.reinterpret<ShortVar>()[0] = color.r.toShort()
+		rowBuffer.plus(3 * x + 1)!!.reinterpret<ShortVar>()[0] = color.g.toShort()
+		rowBuffer.plus(3 * x + 2)!!.reinterpret<ShortVar>()[0] = color.b.toShort()
 	} catch (e: Exception) {
 		e.printStackTrace()
 		exit(1)
